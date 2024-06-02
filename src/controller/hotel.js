@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
+const axios = require('axios');
 const hotelModel = require('../model/hotel');
+const permissionModel = requier('../model/permission');
 const userHotelMappingModle = require("../model/userHotelMapping");
 const responseLib = require("../libs/responseLib");
 const checkLib = require("../libs/checkLib");
@@ -29,33 +31,33 @@ const addHotel = async (req, res) => {
 const bookHotel = async (req, res) => {
     try {
       const {userId,hotelId,checkIn,checkOut,guests} = req.body;
-      console.log("req body====>",req.body);
-      const hotel = await hotelModel.findOne({ hotelId,isAvailable: true });
-      console.log("hotel ===>",hotel);
-      let message;
-      let data;
-      let bookingId = "";
-      if (!checksLib.isEmpty(hotel)) {
-        hotel.isAvailable = false;
-        await hotel.save();
-        bookingId = common.generateRandomId();
-        const userHotelMapping = new userHotelMappingModle({
-          bookingId,
-          userId,
-          hotelId,
-          bookingDate:Date.now(),
-          checkIn,
-          checkOut,
-          guests
+      let permission = await permissionModel.findOne();
+      
+      if (permission.permission === false) {
+        const apiResponse = responseLib.generate(false, "Permission denied by AWS server", {});
+        return res.status(403).send(apiResponse);
+      }
+    
+      const postData = {
+        userId,hotelId,checkIn,checkOut,guests
+      };
+      
+      // Define the URL of the API endpoint
+      const apiUrl = 'https://my-blog-sntj.onrender.com/book-hotel';
+      
+      // Make the POST request using Axios
+      axios.post(apiUrl, postData)
+        .then(response => {
+          message = "Hotel Booked successfully";
+          const apiResponse = {success:true,message,response};
+          return res.status(200).send(apiResponse);
         })
-        await userHotelMapping.save();
-        message = "Hotel Booked successfully";
-        
-      } else {
+        .catch(error => {
+          console.error('Error:', error);
+        });
         message = "Hotel not available";
         data = {};
-      }
-      const apiResponse = {success:true,message,bookingId};
+      const apiResponse = {success:true,message,data};
       res.status(200).send(apiResponse);
     } catch (err) {
       const apiResponse = responseLib.generate(false, err.message,{});
@@ -68,16 +70,23 @@ const bookHotel = async (req, res) => {
 //get all the available hotels
 const getAvailableHotels = async (req, res) => {
   try {
-      const hotels = await hotelModel.find({ isAvailable: true }).select({ _id: 0, hotelId: 1, hotelName: 1, rating: 1, price: 1, isAvailable: 1 });
-      console.log("hotel ===>", hotels);
-      const message = hotels.length > 0 ? "Available hotels are following" : "No hotel available";
-      const apiResponse = { success: true, message, hotels };
-      res.status(200).send(apiResponse);
+    const token = req.headers.token;
+    console.log(token) 
+    const response = await axios.get('https://my-blog-sntj.onrender.com/get-hotel', {  //available hotel list getting from cloud server,here we connect local to cloude server
+      headers: {
+        'token': token 
+      }
+    });
+    const hotels = response.data.hotels; 
+    const message = hotels.length > 0 ? "Available hotels are following" : "No hotel available";
+    const apiResponse = { success: true, message, hotels };
+    res.status(200).send(apiResponse);
   } catch (error) {
-      const apiResponse = responseLib.generate(false, error.message, {});
-      res.status(500).send(apiResponse);
+    const apiResponse = responseLib.generate(false, error.message, {}); // Assuming responseLib is defined elsewhere
+    res.status(500).send(apiResponse);
   }
 }
+
 
 
 module.exports = {
