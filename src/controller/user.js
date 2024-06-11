@@ -4,7 +4,6 @@ const tokenLib = require("../libs/tokenLib");
 const passwordLib = require("../libs/passwordLib");
 const responseLib = require("../libs/responseLib");
 const checkLib = require("../libs/checkLib");
-const common = require("../controller/common")
 
 
 // Login
@@ -37,13 +36,12 @@ const login = async (req, res) => {
 //Registration
 const register = async (req, res) => {
   try {
-    const {name,email,password,address} = req.body;
+    const {name,userId,email,password,address} = req.body;
     const isUserExist = await userModerl.findOne({email});
     if(isUserExist){
       const apiResponse = responseLib.generate(false,"This email is already registered",{});
       return res.status(200).send(apiResponse);
     }
-    const userId = await common.generateRandomId();
     let newUser = new userModerl({
       userId:userId,
       name:name,

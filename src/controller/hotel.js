@@ -2,16 +2,14 @@ const mongoose = require("mongoose");
 const axios = require('axios');
 const hotelModel = require('../model/hotel');
 const permissionModel = require('../model/permission');
-const userHotelMappingModle = require("../model/userHotelMapping");
+const userHotelMappingModel = require("../model/userHotelMapping");
 const responseLib = require("../libs/responseLib");
 const checkLib = require("../libs/checkLib");
-const common = require("../controller/common")
 
 // add new hotel
 const addHotel = async (req, res) => {
   try {
-    const {hotelName,rating,price}=req.body;
-    const hotelId = await common.generateRandomId();
+    const {hotelName,hotelId,rating,price}=req.body;
     const newHotel = new hotelModel({
         hotelId,
         hotelName,
@@ -31,7 +29,7 @@ const addHotel = async (req, res) => {
 const bookHotel = async (req, res) => {
     try {
       const {userId,hotelId,checkIn,checkOut,guests} = req.body;
-      let permission = await permissionModel.findOne();
+      let permission = await permissionModel.findOne({});
       
       if (permission.permission === false) {
         const apiResponse = responseLib.generate(false, "Permission denied by AWS server", {});

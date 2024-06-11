@@ -6,16 +6,19 @@ const checkLib = require("../libs/checkLib");
 const serverPermission = async (req, res) => {
     try {
         // Fetch the permission document
-        let permission = await Permission.findOne();
+        let permission = await Permission.findOne({});
 
         if (!permission) {
-            throw new Error("Permission document not found");
+            // Create a new permission document if it doesn't exist
+            permission = new Permission({
+                permission: true // or false, based on your initial requirement
+            });
+        } else {
+            // Toggle the permission value if the document exists
+            permission.permission = !permission.permission;
         }
 
-        // Toggle the permission value
-        permission.permission = !permission.permission;
-
-        // Save the updated permission document
+        // Save the permission document
         await permission.save();
 
         const message = permission.permission ? "Permission is now true" : "Permission is now false";
@@ -29,4 +32,4 @@ const serverPermission = async (req, res) => {
 
 module.exports = {
     serverPermission
-}
+};
