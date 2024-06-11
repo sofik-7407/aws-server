@@ -4,7 +4,6 @@ const crypto=require('crypto')
 const hash=async(password)=>{
         return new Promise((resolve,reject)=>{
         const salt=crypto.randomBytes(12).toString("hex")
-
         crypto.scrypt(password,salt,10,(err,derivedKey)=>{
             if(err) 
             reject(err)

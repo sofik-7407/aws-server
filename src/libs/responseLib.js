@@ -1,7 +1,5 @@
-//response generation format for api
-const encLib=require('./encLib')
 
-let generateEnc=(err,message,data)=>{
+const generateEnc=(err,message,data)=>{
     let response={
         error:err,
         message:message,
@@ -10,7 +8,7 @@ let generateEnc=(err,message,data)=>{
     return response
 }
 
-let generate=(success,message,data)=>{
+const generate=(success,message,data)=>{
     let response={
         success:success,
         message:message,

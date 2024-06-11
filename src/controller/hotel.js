@@ -36,25 +36,23 @@ const bookHotel = async (req, res) => {
         return res.status(403).send(apiResponse);
       }
     
-      const postData = {
-        userId,hotelId,checkIn,checkOut,guests
+      const bookingData = {
+        bookingId,
+        userId,
+        hotelId,
+        checkIn,
+        checkOut,
+        guests
       };
       
       // Define the URL of the API endpoint
-      const apiUrl = 'https://my-blog-sntj.onrender.com/book-hotel';
-      
+      const serviceUrl = 'https://render-server-1oni.onrender.com/book-hotel';
       // Make the POST request using Axios
-      axios.post(apiUrl, postData)
-        .then(response => {
-          message = "Hotel Booked successfully";
-          const apiResponse = {success:true,message,response};
-          return res.status(200).send(apiResponse);
-        })
-        .catch(error => {
-          console.error('Error:', error);
-        });
-        message = "Hotel not available";
-        data = {};
+      const serviceRequest = axios.post(serviceUrl, bookingData)
+
+      await Promise.all([service1Request]);
+      message = "Hotel not available";
+      data = {};
       const apiResponse = {success:true,message,data};
       res.status(200).send(apiResponse);
     } catch (err) {

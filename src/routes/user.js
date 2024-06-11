@@ -1,5 +1,4 @@
 const userController = require("../controller/user");
-const auth=require('../middleware/auth')
 const validator=require('../middleware/validator')
 
 //set Rotes for User routers
