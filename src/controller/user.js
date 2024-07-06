@@ -13,7 +13,7 @@ const login = async (req, res) => {
     const userDetails = await userModerl.findOne({email});
     if(checkLib.isEmpty(userDetails)){
       const apiResponse = responseLib.generate(false,"email not registered",{});
-      return res.staus(200).send(apiResponse);
+      return res.status(200).send(apiResponse);
     }
     if (await passwordLib.verify(password,userDetails.password)) {
       console.log("Verified");
@@ -36,6 +36,7 @@ const login = async (req, res) => {
 //Registration
 const register = async (req, res) => {
   try {
+    console.log("request body ------>",req.body);
     const {name,userId,email,password,address} = req.body;
     const isUserExist = await userModerl.findOne({email});
     if(isUserExist){
