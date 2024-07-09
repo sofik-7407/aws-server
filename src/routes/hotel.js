@@ -5,7 +5,7 @@ const validator=require('../middleware/validator')
 //set Rotes for User routers
 const setRouter=(app)=>{
     
-    app.post(`/add-hotel`,validator.addHotelValidate,hotelController.addHotel);
+    app.post(`/add-hotel`,hotelController.addHotel);
     app.post(`/book-hotel`,hotelController.bookHotel);
     app.get(`/get-hotel`,hotelController.getAvailableHotels);
 

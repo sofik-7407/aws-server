@@ -46,7 +46,7 @@ const register = async (req, res) => {
     let newUser = new userModerl({
       userId:userId,
       name:name,
-      password: await passwordLib.hash(password),
+      password,
       email:email,
       address : address
     });
