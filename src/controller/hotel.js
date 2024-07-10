@@ -36,6 +36,7 @@ const bookHotel = async (req, res) => {
         return res.status(200).send(apiResponse);
       }
       const hotel = await hotelModel.findOne({ hotelId,isAvailable: true });
+      console.log("hotel", hotel)
       if(!hotel) {
         return res.status(200).send({success: false, message: "No hotel available",data:{}});
       }
@@ -52,6 +53,7 @@ const bookHotel = async (req, res) => {
       const serviceUrl = 'https://render-server-1oni.onrender.com/book-hotel';
       // Make the POST request using Axios
       const data = await axios.post(serviceUrl, bookingData)
+      console.log("response ---->",data.data);
       if(data.data){
         hotel.isAvailable = false;
         await hotel.save();
