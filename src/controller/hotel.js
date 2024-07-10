@@ -35,7 +35,10 @@ const bookHotel = async (req, res) => {
         const apiResponse = responseLib.generate(false, "Permission denied by AWS server", {});
         return res.status(403).send(apiResponse);
       }
-    
+      const hotel = await hotelModel.findOne({ hotelId,isAvailable: true });
+      if(!hotel) {
+        return res.status(200).send({success: false, message: "No hotel available",data:{}});
+      }
       const bookingData = {
         bookingId,
         userId,
@@ -48,12 +51,22 @@ const bookHotel = async (req, res) => {
       // Define the URL of the API endpoint
       const serviceUrl = 'https://render-server-1oni.onrender.com/book-hotel';
       // Make the POST request using Axios
-      const serviceRequest = axios.post(serviceUrl, bookingData)
-
-      await Promise.all([service1Request]);
-      message = "Hotel not available";
-      data = {};
-      const apiResponse = {success:true,message,data};
+      const data = await axios.post(serviceUrl, bookingData)
+      if(data.data){
+        hotel.isAvailable = false;
+        await hotel.save();
+        const userHotelMapping = new userHotelMappingModel({
+          bookingId,
+          userId,
+          hotelId,
+          bookingDate:Date.now(),
+          checkIn,
+          checkOut,
+          guests
+        })
+        await userHotelMapping.save();
+      }
+      const apiResponse = {success:true,message:"Hotel booked successfully",data:data.data};
       res.status(200).send(apiResponse);
     } catch (err) {
       const apiResponse = responseLib.generate(false, err.message,{});
@@ -66,16 +79,9 @@ const bookHotel = async (req, res) => {
 //get all the available hotels
 const getAvailableHotels = async (req, res) => {
   try {
-    const token = req.headers.token;
-    console.log(token) 
-    const response = await axios.get('https://my-blog-sntj.onrender.com/get-hotel', {  //available hotel list getting from cloud server,here we connect local to cloude server
-      headers: {
-        'token': token 
-      }
-    });
-    const hotels = response.data.hotels; 
-    const message = hotels.length > 0 ? "Available hotels are following" : "No hotel available";
-    const apiResponse = { success: true, message, hotels };
+    const hotelList = await hotelModel.find({});
+    const message = hotelList.length > 0 ? "Available hotels are following" : "No hotel available";
+    const apiResponse = { success: true, message, hotelList };
     res.status(200).send(apiResponse);
   } catch (error) {
     const apiResponse = responseLib.generate(false, error.message, {}); // Assuming responseLib is defined elsewhere
