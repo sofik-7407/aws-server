@@ -82,7 +82,7 @@ const bookHotel = async (req, res) => {
 //get all the available hotels
 const getAvailableHotels = async (req, res) => {
   try {
-    const hotelList = await hotelModel.find({});
+    const hotelList = await hotelModel.find({isAvailable: true});
     const message = hotelList.length > 0 ? "Available hotels are following" : "No hotel available";
     const apiResponse = { success: true, message, hotelList };
     res.status(200).send(apiResponse);
