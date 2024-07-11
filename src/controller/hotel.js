@@ -40,6 +40,8 @@ const bookHotel = async (req, res) => {
       if(!hotel) {
         return res.status(200).send({success: false, message: "No hotel available",data:{}});
       }
+      hotel.isAvailable = false;
+      await hotel.save();
       const bookingData = {
         bookingId,
         userId,
@@ -56,8 +58,6 @@ const bookHotel = async (req, res) => {
       const data = await axios.post(serviceUrl, bookingData)
       console.log("response ---->",data.data);
       if(data.data){
-        hotel.isAvailable = false;
-        await hotel.save();
         const userHotelMapping = new userHotelMappingModel({
           bookingId,
           userId,
