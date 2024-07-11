@@ -28,14 +28,14 @@ const addHotel = async (req, res) => {
 //Book hotel by it's id
 const bookHotel = async (req, res) => {
     try {
-      const {userId,hotelId,checkIn,checkOut,guests} = req.body;
+      const {bookingId,userId,hotelId,checkIn,checkOut,guests} = req.body;
       let permission = await permissionModel.findOne({});
       
       if (permission.permission === false) {
         const apiResponse = responseLib.generate(false, "Permission denied by AWS server", {});
         return res.status(200).send(apiResponse);
       }
-      const hotel = await hotelModel.findOne({ hotelId,isAvailable: true });
+      const hotel = await hotelModel.find({ hotelId,isAvailable: true });
       console.log("hotel", hotel)
       if(!hotel) {
         return res.status(200).send({success: false, message: "No hotel available",data:{}});
@@ -51,6 +51,7 @@ const bookHotel = async (req, res) => {
       
       // Define the URL of the API endpoint
       const serviceUrl = 'https://render-server-1oni.onrender.com/book-hotel';
+
       // Make the POST request using Axios
       const data = await axios.post(serviceUrl, bookingData)
       console.log("response ---->",data.data);
