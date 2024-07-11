@@ -35,7 +35,7 @@ const bookHotel = async (req, res) => {
         const apiResponse = responseLib.generate(false, "Permission denied by AWS server", {});
         return res.status(200).send(apiResponse);
       }
-      const hotel = await hotelModel.find({ hotelId,isAvailable: true });
+      const hotel = await hotelModel.findOne({ hotelId,isAvailable: true });
       console.log("hotel", hotel)
       if(!hotel) {
         return res.status(200).send({success: false, message: "No hotel available",data:{}});
